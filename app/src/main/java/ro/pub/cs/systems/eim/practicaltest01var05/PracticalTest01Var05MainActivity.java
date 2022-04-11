@@ -2,6 +2,7 @@ package ro.pub.cs.systems.eim.practicaltest01var05;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,9 +13,8 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
 
     private Button buttonTL, buttonTR, buttonC, buttonBL, buttonBR, buttonNextActivity;
     private EditText textField;
-    private ButtonClickListener buttonClickListener = new ButtonClickListener();
-
     int totalClicks;
+    private ButtonClickListener buttonClickListener = new ButtonClickListener();
     private class ButtonClickListener implements View.OnClickListener {
         @Override
         public void onClick(View view) {
@@ -45,6 +45,12 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
                     textField.setText(aux);
                     totalClicks++;
                     break;
+                case R.id.practicBNextActivity:
+                    Intent intent = new Intent(getApplicationContext(), PracticalTest01Var05SecondaryActivity.class);
+                    intent.putExtra(Constants.INDICATIONS, textField.getText().toString());
+                    startActivityForResult(intent, Constants.SECONDARY_ACTIVITY_REQUEST_CODE);
+                    break;
+                // ...
             }
         }
     }
@@ -67,6 +73,7 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
         buttonC.setOnClickListener(buttonClickListener);
         buttonBL.setOnClickListener(buttonClickListener);
         buttonBR.setOnClickListener(buttonClickListener);
+        buttonNextActivity.setOnClickListener(buttonClickListener);
     }
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
@@ -83,5 +90,11 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
         }
         Toast.makeText(this, "The total clicks are " + totalClicks, Toast.LENGTH_LONG).show();
     }
-
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
+        super.onActivityResult(requestCode, resultCode, intent);
+        if (requestCode == Constants.SECONDARY_ACTIVITY_REQUEST_CODE) {
+            Toast.makeText(this, "The activity returned with result " + resultCode, Toast.LENGTH_LONG).show();
+        }
+    }
 }
