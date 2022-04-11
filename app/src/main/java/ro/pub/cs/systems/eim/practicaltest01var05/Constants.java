@@ -10,8 +10,7 @@ public interface Constants {
     final public static String SECOND_NUMBER = "secondNumber";
 
     final public static String[] actionTypes = {
-            "ro.pub.cs.systems.eim.practicaltest01.arithmeticmean",
-            "ro.pub.cs.systems.eim.practicaltest01.geometricmean"
+            "ro.pub.cs.systems.eim.practicaltest01.indications"
     };
 
     final public static int NUMBER_OF_CLICKS_THRESHOLD = 5;

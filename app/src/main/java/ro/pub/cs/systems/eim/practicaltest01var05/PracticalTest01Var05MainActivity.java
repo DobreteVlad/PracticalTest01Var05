@@ -2,8 +2,12 @@ package ro.pub.cs.systems.eim.practicaltest01var05;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,6 +18,8 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
     private Button buttonTL, buttonTR, buttonC, buttonBL, buttonBR, buttonNextActivity;
     private EditText textField;
     int totalClicks;
+    private int serviceStatus = Constants.SERVICE_STOPPED;
+    private IntentFilter intentFilter = new IntentFilter();
     private ButtonClickListener buttonClickListener = new ButtonClickListener();
     private class ButtonClickListener implements View.OnClickListener {
         @Override
@@ -52,6 +58,13 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
                     break;
                 // ...
             }
+            if (totalClicks > 3
+                    && serviceStatus == Constants.SERVICE_STOPPED) {
+                Intent intent = new Intent(getApplicationContext(), PracticalTes01Var05Service.class);
+                intent.putExtra(Constants.INDICATIONS, textField.getText().toString());
+                getApplicationContext().startService(intent);
+                serviceStatus = Constants.SERVICE_STARTED;
+            }
         }
     }
     @Override
@@ -74,6 +87,9 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
         buttonBL.setOnClickListener(buttonClickListener);
         buttonBR.setOnClickListener(buttonClickListener);
         buttonNextActivity.setOnClickListener(buttonClickListener);
+        for (int index = 0; index < Constants.actionTypes.length; index++) {
+            intentFilter.addAction(Constants.actionTypes[index]);
+        }
     }
     @Override
     protected void onSaveInstanceState(Bundle savedInstanceState) {
@@ -96,5 +112,29 @@ public class PracticalTest01Var05MainActivity extends AppCompatActivity {
         if (requestCode == Constants.SECONDARY_ACTIVITY_REQUEST_CODE) {
             Toast.makeText(this, "The activity returned with result " + resultCode, Toast.LENGTH_LONG).show();
         }
+    }
+    @Override
+    protected void onDestroy() {
+        Intent intent = new Intent(this, PracticalTes01Var05Service.class);
+        stopService(intent);
+        super.onDestroy();
+    }
+    private MessageBroadcastReceiver messageBroadcastReceiver = new MessageBroadcastReceiver();
+    private class MessageBroadcastReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.d(Constants.BROADCAST_RECEIVER_TAG, intent.getStringExtra(Constants.BROADCAST_RECEIVER_EXTRA));
+        }
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(messageBroadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onPause() {
+        unregisterReceiver(messageBroadcastReceiver);
+        super.onPause();
     }
 }
